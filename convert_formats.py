@@ -1,162 +1,184 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import xml.etree.ElementTree as et
-import sys
 import re
-from os.path import basename
 import os
-import sys
-import re
-pattern = re.compile("^$")
-rootdir = "sharedtask-data"
+import argparse
+from itertools import izip
+from __builtin__ import str
 
 
+pattern = re.compile("^FR$")
+rootdir = "data"
 
-def mwetagprocess(input_file,filename,type):
+def num_there(s):
+    return any(i.isdigit() for i in s)
 
-    file2 = open(filename, 'w')
-    if not os.path.exists(input_file):
-        print ("input_file file does not exist", input_file)
+def process_block(block): 
+    mwe_list = []
+    lemma_list = []
+    for index_line, line in enumerate(block):
+        if num_there(line):
+            attributes = line.split()
+            mwe_list.append(attributes[-1]) #last element is mwe tag from parsemetsv
+            lemma_list.append(attributes[2]) #third attribute from conllu is lemma 
+    
+    dict_vmwe = {}
+    dict_lemma = {}    
+    dict_vmwe, dict_lemma = stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma)
+    length_of_sentence = len(mwe_list)
+    out_vmwe_list, out_lemma_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
+    #block = filter(None, block)
+    newblock = []
+
+    for line in block:
+        if num_there(line):
+            attrs = line.split()
+            del attrs[-4:]
+            attrs[1], attrs[0] = attrs[0], attrs[1] #swap ID and wordform (While compiling, manatee script will treat first column as word forms)
+            newblock.append("\t".join(attrs))
+    
+    #print "BLOCK: ", newblock
+    
+    outblock = [ "{}\t{}\t{}".format(a, b, c) for a, b, c in  zip(newblock, out_vmwe_list, out_lemma_list) ]
+    #print "\n".join(outblock)
+    return outblock
+    
+def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
+    out_vmwe_list = ['_'] * length_of_sentence
+    out_lemma_list = ['_'] * length_of_sentence
+    for mwe_number, vmwe_tags in dict_vmwe.iteritems():
+        type = vmwe_tags.split("_")[0]
+        positions = vmwe_tags.split("_")[1:]
+        lemma = dict_lemma[mwe_number]
+
+        
+        for ind, pos in enumerate(positions):
+            if ind == 0 and out_vmwe_list[int(pos)] == '_': # :head, single 
+                out_vmwe_list[int(pos)] = type + ":head"
+                out_lemma_list[int(pos)] = lemma
+                
+            elif ind == 0 and out_vmwe_list[int(pos)] != '_':
+                
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type + ":head"
+                new_lemma = out_lemma_list[int(pos)] + ";" + lemma 
+                out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
+                
+            elif ind != 0 and out_vmwe_list[int(pos)] != '_':# ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_']
+                new_vmew = out_vmwe_list[int(pos)] + ";" + type + ":child"#
+                new_lemma = out_lemma_list[int(pos)] + ";" + lemma                 
+            
+            else:
+                out_vmwe_list[int(pos)] = type + ":child"
+                out_lemma_list[int(pos)] = lemma
+                
+
+    return out_vmwe_list, out_lemma_list
+            
+           
+#########Given mwe and lemma attribute lists returns the positions. Output: mwe_list: {'1': 'LVC_3_5'} lemma_list:{'1': 'il_de'} ############
+def stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma):
+   
+    for ind, mwe in enumerate(mwe_list):
+        if ";" in mwe:
+            multiple_mwes = mwe.split(";")
+            for mul_mwe in multiple_mwes:
+                if ":" in mul_mwe:
+                    number_mwe, type_mwe = mul_mwe.split(":")
+                    position_type = type_mwe + "_" + str(ind)
+                    dict_vmwe[number_mwe] = position_type
+                    lemma = lemma_list[ind]
+                    dict_lemma[number_mwe] = lemma
+                else: # ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_'] quick_ugly_hack!! need to make some recursion instead.
+                    print "THIS MWE needs special treatment", mul_mwe
+                    if mul_mwe in dict_vmwe:
+                        current_value = dict_vmwe.get(mul_mwe)
+                        new_value = current_value + "_" + str(ind)
+                        dict_vmwe.update({mul_mwe: new_value})
+                        current_lemma = dict_lemma.get(mul_mwe)
+                        new_lemma = current_lemma + "_" + lemma_list[ind]
+                        dict_lemma.update({mul_mwe: new_lemma})
+                
+        elif ":" in mwe and not ";" in mwe:
+            number_mwe, type_mwe = mwe.split(":")
+            position_type = type_mwe + "_" + str(ind)
+            dict_vmwe[number_mwe] = position_type
+            lemma = lemma_list[ind]
+            dict_lemma[number_mwe] = lemma
+
+                                        
+        elif mwe.isdigit():
+            if mwe in dict_vmwe:
+                current_value = dict_vmwe.get(mwe)
+                new_value = current_value + "_" + str(ind)
+                dict_vmwe.update({mwe: new_value})
+                current_lemma = dict_lemma.get(mwe)
+                new_lemma = current_lemma + "_" + lemma_list[ind]
+                dict_lemma.update({mwe: new_lemma})
+        
+    #print dict_vmwe
+    #print dict_lemma
+    return dict_vmwe, dict_lemma
+        
+
+def mwetagprocess(input_conllu, parsemetsv):
+    
+    vert_out = os.path.splitext(input_conllu)[0]+'.vert'
+    print (parsemetsv, vert_out)
+    file2 = open(vert_out, 'w')
+    if not os.path.exists(input_conllu):
+        print ("input_file file does not exist", input_conllu)
         return 0
-    print ("Exists file ", input_file)
-    mwetags = []
-    line_num = 0
-    annotated_mwes = []
-    term_closed = 0
-    cont_closed = 0
-    newnum = 0; lastnum = 0
-    for line in open(input_file):
-        if line.startswith("#"):
-            continue
-        line_num +=1
+    print ("Exists file ", input_conllu)    
+    file2.write("<doc>\n")
+    for block in read_blocks(input_conllu, parsemetsv):
+        outblock = process_block(block)
 
-        if line not in ['\n', '\n\r', '\t\n']: # enumerate lines
-            #print "parsemetsv:" + line
-            attributes = line.split("\t")
-            mwe = attributes[13]
-            re_d = re.compile("(\d)")
+        file2.write("<s>\n")
+        file2.write("\n".join(outblock))
+        file2.write("\n</s>\n")
+        
+    file2.write("</doc>")
+    file2.close
+   
+def read_blocks(input_conllu, parsemetsv):    # function stolen from SO
+    with open(input_conllu) as file_conllu, open(parsemetsv) as file_parsemetsv: 
+        empty_lines = 0
+        blocks = []
 
-            if not mwe.startswith("_") and ":" in mwe :
-                mwe1 = re.sub(r'^[0-9]+:', r'', mwe)
-                newnum = re.sub(r':.*', r'',mwe )
-
-                type = re.sub(r'\n$', r'', mwe1)
-                print "num: " + newnum + "type " + type
-                if lastnum and lastnum != newnum:
-                    print "</mwe>"
-                print "<mwe type=\"" + type + "\" role=\"head\"" + ">"
-                print line
-                annotated_mwes.append(type)
-
-            elif not mwe.startswith("_") and ":" not in mwe:
-                if cont_closed == 0: # first occurence of cont
-                    print "<mwe type=\"" + annotated_mwes[0] + "\" role=\"cont\">"
-                    print line
-                    cont_closed = 1
-                elif term_closed == 0:
-                    print "</mwe>"
-                else:
-                    print line
-
-            elif annotated_mwes and mwe.startswith("_") and term_closed == 0:
-                #discontinuous!!!wordds in between the head word
-                print "</mwe>"
-                print line
-                term_closed = 1 # close term only before the first embedded non-mwe
-
-            elif term_closed == 1 and  mwe.startswith("_"):
-                print line
-
+        for line, line_parsemetsv in izip(file_conllu, file_parsemetsv):
+            #print "LINE: ", line, line_parsemetsv
+        # Check for empty/commented lines
+            if not line or line.startswith('#'):
+            #    print "if not line or line.startswith('#') or line in ['', '\n', '\n\r', '\t\n']:", line
+            # If 1st one: new block
+                if empty_lines == 0:
+                    blocks.append([])
+                empty_lines += 1
+        # Non empty line: add line in current(last) block
             else:
-                print line
 
-            lastnum = newnum
-
-            mwe1 = re.sub(r'^[0-9]:', r'', attributes[13])
-            mwe2 = re.sub(r';.*$', r'', mwe1)
-            mwe = re.sub(r'^[0-9]$', r'CONT', mwe2)
-            mwetags.append(mwe)
-
-        else:
-            print("</s>") + "\n" + ("<s>")
-            file2.write("".join(mwetags))
-            file2.write("\n")
-            mwetags = []
-            #line_num = 0
-    file2.close()
-
-
-
-def formatting(input_file, filename, lang, parseme):
-    file1 = open(filename, 'w')
-    if not os.path.exists(input_file):
-        print ("input_file file does not exist", input_file)
-        input_file = parseme
-    print ("Exists file ", input_file)
-    newattributes = []
-    for line in open(input_file):
-        if line.startswith("#"):
-            continue
-
-        if line not in ['\n', '\n\r']:
-            #print "parsemetsv:" + line
-            attributes = line.split("\t")
-            if lang == 'MT':  # for MAltese, the forth attribute is a tag
-                newattributes.append(attributes[0] + '\t' + attributes[1] + '\t' + attributes[2] + "\t" + attributes[4])
-            elif lang =='HE' or lang == 'BG' or lang =='LT' or lang =='IT':
-                newattributes.append(attributes[0] + '\t' + attributes[1] + '\t' + '_' + '\t' + '_')
-            else:
-                newattributes.append(attributes[0] + '\t'+ attributes[1] + '\t' + attributes[2] + "\t" + attributes[3])
-
-        else:
-            #print(newattributes)
-            #print("\n")
-            file1.write("\n".join(newattributes))
-            file1.write("\n\n")
-            newattributes = []
-
-    file1.close()
+                empty_lines = 0
+                line = line.strip()
+                line_parsemetsv = line_parsemetsv.strip()                
+                blocks[-1].append(line+"\t"+line_parsemetsv)
+                
+    #blocks = filter(None, blocks)
+    return blocks
+        
 
 def main():
-    import argparse
-    import subprocess
+    
     parser = argparse.ArgumentParser()
-
-    parser.add_argument("--annotation", type=str, help="Annotation: forms, lemmas_tags,for_TF")
-    parser.add_argument("--save", type=str, help="Annotation: forms, lemmas_tags,for_TF")
-    parser.add_argument("--type", type=str, help="type of annotation")
     parser.add_argument("--data", type=str, help="test.blind or train")
-    args = parser.parse_args()
-    from subprocess import call
-    argv = sys.argv
-    print ("I am here")
-#    if len(argv) !=2:
-#        print 'USAGE: {} <format: forms, lemmas_tags, for_TF>'.format(argv[0])
-#        sys.exit(0)
-    dataformat = args.annotation
-    mwetagprocess("cs_40.all", "outhead100","CS")
 
     for root, subFolders, files in os.walk(rootdir):
-        for folder in subFolders:
-            #print folder
-            if pattern.match(folder): #only language folders
-            #print folder
-                out_conllu = rootdir + "/" + folder + "/paste1_conllu_{}_{}".format(args.data, folder, dataformat)
-                out_parseme = rootdir + "/" + folder + "/paste2_parseme_{}_{}".format(args.data, folder, dataformat)
-                out_joinlemma = rootdir + "/" + folder + "/paste2_parseme_joinlemma_{}_{}".format(args.data, folder, dataformat)
-                input_file = rootdir + "/" + folder + "/{}.conllu".format(args.data)
-                parseme = rootdir + "/" + folder + "/{}.parsemetsv".format(args.data)
-                all_text = "head100"
-                if args.data=='test':
-                    parseme = rootdir + "/" + folder + "/{}.blind.parsemetsv".format(args.data)
-
-                if formatting(input_file, out_conllu,folder,parseme) == 0:
-                    continue
-                else:
-                    print ("Converting ", input_file)
-                    #formatting(input_file,out_conllu,folder,parseme)
-                    mwetagprocess(parseme,out_parseme,dataformat)
+        for lang_folder in subFolders:
+            if pattern.match(lang_folder): #only language folders
+                conllu = rootdir + "/" + lang_folder + "/60.train.conllu"
+                parsemetsv = rootdir + "/" + lang_folder + "/60.train.parsemetsv"
+                
+                mwetagprocess(conllu, parsemetsv)
 
 
 if __name__ == "__main__":
