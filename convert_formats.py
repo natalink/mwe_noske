@@ -8,8 +8,8 @@ from itertools import izip
 from __builtin__ import str
 
 
-pattern = re.compile("^FR$")
-rootdir = "data"
+pattern = re.compile("^..$")
+rootdir = "data_sample"
 
 def num_there(s):
     return any(i.isdigit() for i in s)
@@ -21,27 +21,24 @@ def process_block(block):
         if num_there(line):
             attributes = line.split()
             mwe_list.append(attributes[-1]) #last element is mwe tag from parsemetsv
-            lemma_list.append(attributes[2]) #third attribute from conllu is lemma 
+            lemma_list.append(attributes[1]) #third attribute from conllu is lemma 
     
     dict_vmwe = {}
     dict_lemma = {}    
     dict_vmwe, dict_lemma = stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma)
     length_of_sentence = len(mwe_list)
     out_vmwe_list, out_lemma_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
-    #block = filter(None, block)
     newblock = []
 
     for line in block:
         if num_there(line):
             attrs = line.split()
             del attrs[-4:]
-            attrs[1], attrs[0] = attrs[0], attrs[1] #swap ID and wordform (While compiling, manatee script will treat first column as word forms)
+            # done earlier attrs[1], attrs[0] = attrs[0], attrs[1] #swap ID and wordform (While compiling, manatee script will treat first column as word forms)
             newblock.append("\t".join(attrs))
     
-    #print "BLOCK: ", newblock
     
     outblock = [ "{}\t{}\t{}".format(a, b, c) for a, b, c in  zip(newblock, out_vmwe_list, out_lemma_list) ]
-    #print "\n".join(outblock)
     return outblock
     
 def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
@@ -90,7 +87,6 @@ def stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma):
                     lemma = lemma_list[ind]
                     dict_lemma[number_mwe] = lemma
                 else: # ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_'] quick_ugly_hack!! need to make some recursion instead.
-                    print "THIS MWE needs special treatment", mul_mwe
                     if mul_mwe in dict_vmwe:
                         current_value = dict_vmwe.get(mul_mwe)
                         new_value = current_value + "_" + str(ind)
@@ -116,70 +112,58 @@ def stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma):
                 new_lemma = current_lemma + "_" + lemma_list[ind]
                 dict_lemma.update({mwe: new_lemma})
         
-    #print dict_vmwe
-    #print dict_lemma
+
     return dict_vmwe, dict_lemma
         
-
-def mwetagprocess(input_conllu, parsemetsv):
-    
-    vert_out = os.path.splitext(input_conllu)[0]+'.vert'
-    print (parsemetsv, vert_out)
-    file2 = open(vert_out, 'w')
-    if not os.path.exists(input_conllu):
-        print ("input_file file does not exist", input_conllu)
-        return 0
-    print ("Exists file ", input_conllu)    
-    file2.write("<doc>\n")
-    for block in read_blocks(input_conllu, parsemetsv):
-        outblock = process_block(block)
-
-        file2.write("<s>\n")
-        file2.write("\n".join(outblock))
-        file2.write("\n</s>\n")
-        
-    file2.write("</doc>")
-    file2.close
    
-def read_blocks(input_conllu, parsemetsv):    # function stolen from SO
+def read_blocks(input_conllu, parsemetsv, file2):   
+   
     with open(input_conllu) as file_conllu, open(parsemetsv) as file_parsemetsv: 
-        empty_lines = 0
         blocks = []
-
         for line, line_parsemetsv in izip(file_conllu, file_parsemetsv):
-            #print "LINE: ", line, line_parsemetsv
-        # Check for empty/commented lines
-            if not line or line.startswith('#'):
-            #    print "if not line or line.startswith('#') or line in ['', '\n', '\n\r', '\t\n']:", line
-            # If 1st one: new block
-                if empty_lines == 0:
-                    blocks.append([])
-                empty_lines += 1
-        # Non empty line: add line in current(last) block
-            else:
 
-                empty_lines = 0
-                line = line.strip()
-                line_parsemetsv = line_parsemetsv.strip()                
-                blocks[-1].append(line+"\t"+line_parsemetsv)
-                
-    #blocks = filter(None, blocks)
-    return blocks
+            if line.startswith('#'):
+                continue
         
+            if line not in ['\n', '\n\r', '\t\n']:
 
+                line = line.strip()
+                attrs = line.split("\t")
+                attrs[0],attrs[1] = attrs[1], attrs[0]
+                attrs[1],attrs[2] = attrs[2], attrs[1]
+                swapped_line = "\t".join(attrs)
+                line_parsemetsv = line_parsemetsv.strip()
+                blocks.append(swapped_line+"\t"+line_parsemetsv)                              
+
+            else:
+                #print blocks
+                outblock = process_block(blocks)
+                file2.write("<s>\n")
+                file2.write("\n".join(outblock))
+                file2.write("\n</s>\n")
+                empty_lines = 0
+                blocks = []
+ 
+            
 def main():
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, help="test.blind or train")
-
     for root, subFolders, files in os.walk(rootdir):
         for lang_folder in subFolders:
             if pattern.match(lang_folder): #only language folders
-                conllu = rootdir + "/" + lang_folder + "/60.train.conllu"
-                parsemetsv = rootdir + "/" + lang_folder + "/60.train.parsemetsv"
-                
-                mwetagprocess(conllu, parsemetsv)
-
+                print "processing FOLDER: " + lang_folder
+                conllu = rootdir + "/" + lang_folder + "/train.conllu"
+                parsemetsv = rootdir + "/" + lang_folder + "/train.parsemetsv"
+                vert_out = os.path.splitext(conllu)[0]+ '_' + lang_folder + '.vert'
+                print vert_out
+                file2 = open(vert_out, 'w')
+                file2.write("<doc>\n")
+                read_blocks(conllu, parsemetsv, file2)
+                file2.write("</doc>")
+                file2.close
 
 if __name__ == "__main__":
+    
     main()
+    
