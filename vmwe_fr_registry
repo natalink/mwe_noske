@@ -1,0 +1,68 @@
+ATTRIBUTE word {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+}
+ATTRIBUTE lemma {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+}
+ATTRIBUTE id {
+        TYPE "FD_FGD"
+}
+ATTRIBUTE upostag {
+        TYPE "FD_FGD"
+}
+
+ATTRIBUTE xpostag {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+}
+ATTRIBUTE feats {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+}
+ATTRIBUTE head {
+        TYPE "FD_FGD"
+}
+ATTRIBUTE deprel {
+        TYPE "FD_FGD"
+}
+ATTRIBUTE deps {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+}
+ATTRIBUTE misc {
+        TYPE "FD_FGD"
+}
+ATTRIBUTE vmwe_type {
+        TYPE "FD_FGD"
+	LOCALE "fr_FR.UTF-8"
+        MULTIVALUE y
+        MULTISTEP ";"
+	
+}
+ATTRIBUTE vmwe_dependency {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+        MULTIVALUE y
+        MULTISTEP ";"
+}
+ATTRIBUTE vmwe_id {
+        TYPE "FD_FGD"
+        LOCALE "fr_FR.UTF-8"
+        MULTIVALUE y
+        MULTISTEP ";"
+}
+ATTRIBUTE vmwe_lemma {
+        TYPE "FD_FGD"
+	LOCALE "fr_FR.UTF-8"
+        MULTIVALUE y
+        MULTISTEP ";"
+}
+STRUCTURE s {
+	ATTRIBUTE id
+}
+STRUCTURE doc {
+	ATTRIBUTE id
+        ATTRIBUTE wordcount
+}

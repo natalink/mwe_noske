@@ -9,7 +9,7 @@ from __builtin__ import str
 
 
 pattern = re.compile("^..$")
-rootdir = "data_sample"
+rootdir = "sharedtask_data"
 
 def num_there(s):
     return any(i.isdigit() for i in s)
@@ -27,7 +27,7 @@ def process_block(block):
     dict_lemma = {}    
     dict_vmwe, dict_lemma = stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma)
     length_of_sentence = len(mwe_list)
-    out_vmwe_list, out_lemma_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
+    out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
     newblock = []
 
     for line in block:
@@ -38,39 +38,50 @@ def process_block(block):
             newblock.append("\t".join(attrs))
     
     
-    outblock = [ "{}\t{}\t{}".format(a, b, c) for a, b, c in  zip(newblock, out_vmwe_list, out_lemma_list) ]
+    outblock = [ "{}\t{}\t{}\t{}\t{}".format(a, b, c,d,f) for a, b, c, d, f in  zip(newblock, out_vmwe_list, out_vmwe_dependency_list, out_vmwe_number_list, out_lemma_list ) ]
     return outblock
     
 def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
-    out_vmwe_list = ['_'] * length_of_sentence
+    out_vmwe_list = ['_'] * length_of_sentence # type
+    out_vmwe_number_list = ['_'] * length_of_sentence #
     out_lemma_list = ['_'] * length_of_sentence
+    out_vmwe_dependency_list = ['_'] * length_of_sentence
+    
     for mwe_number, vmwe_tags in dict_vmwe.iteritems():
         type = vmwe_tags.split("_")[0]
         positions = vmwe_tags.split("_")[1:]
         lemma = dict_lemma[mwe_number]
 
         
-        for ind, pos in enumerate(positions):
-            if ind == 0 and out_vmwe_list[int(pos)] == '_': # :head, single 
-                out_vmwe_list[int(pos)] = type + ":head"
+        for ind, pos in enumerate(positions): # ugly hack!!!
+            if ind == 0 and out_vmwe_list[int(pos)] == '_': # :head, single
+                out_vmwe_list[int(pos)] = type
+                out_vmwe_dependency_list[int(pos)] = "head"
                 out_lemma_list[int(pos)] = lemma
+                out_vmwe_number_list[int(pos)] = mwe_number
                 
             elif ind == 0 and out_vmwe_list[int(pos)] != '_':
                 
-                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type + ":head"
-                new_lemma = out_lemma_list[int(pos)] + ";" + lemma 
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":head"
+                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "head"
                 out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
+                out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
                 
             elif ind != 0 and out_vmwe_list[int(pos)] != '_':# ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_']
-                new_vmew = out_vmwe_list[int(pos)] + ";" + type + ":child"#
-                new_lemma = out_lemma_list[int(pos)] + ";" + lemma                 
-            
-            else:
-                out_vmwe_list[int(pos)] = type + ":child"
-                out_lemma_list[int(pos)] = lemma
-                
+                # this may have some bugs, test it on more use cases!!!   
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":head"
+                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "child"
+                out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
+                out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
 
-    return out_vmwe_list, out_lemma_list
+            else:
+                out_vmwe_list[int(pos)] = type# + ":child"
+                out_vmwe_dependency_list[int(pos)] = "child"
+                out_lemma_list[int(pos)] = lemma
+                out_vmwe_number_list[int(pos)] = mwe_number
+                
+    #print out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list
+    return out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list
             
            
 #########Given mwe and lemma attribute lists returns the positions. Output: mwe_list: {'1': 'LVC_3_5'} lemma_list:{'1': 'il_de'} ############
@@ -92,7 +103,7 @@ def stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma):
                         new_value = current_value + "_" + str(ind)
                         dict_vmwe.update({mul_mwe: new_value})
                         current_lemma = dict_lemma.get(mul_mwe)
-                        new_lemma = current_lemma + "_" + lemma_list[ind]
+                        new_lemma = current_lemma + " " + lemma_list[ind] # space iof _
                         dict_lemma.update({mul_mwe: new_lemma})
                 
         elif ":" in mwe and not ";" in mwe:
@@ -109,10 +120,9 @@ def stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma):
                 new_value = current_value + "_" + str(ind)
                 dict_vmwe.update({mwe: new_value})
                 current_lemma = dict_lemma.get(mwe)
-                new_lemma = current_lemma + "_" + lemma_list[ind]
+                new_lemma = current_lemma + " " + lemma_list[ind] # space iof _
                 dict_lemma.update({mwe: new_lemma})
         
-
     return dict_vmwe, dict_lemma
         
    
@@ -121,12 +131,12 @@ def read_blocks(input_conllu, parsemetsv, file2):
     with open(input_conllu) as file_conllu, open(parsemetsv) as file_parsemetsv: 
         blocks = []
         for line, line_parsemetsv in izip(file_conllu, file_parsemetsv):
-
+           
             if line.startswith('#'):
                 continue
         
             if line not in ['\n', '\n\r', '\t\n']:
-
+                
                 line = line.strip()
                 attrs = line.split("\t")
                 attrs[0],attrs[1] = attrs[1], attrs[0]
@@ -136,7 +146,7 @@ def read_blocks(input_conllu, parsemetsv, file2):
                 blocks.append(swapped_line+"\t"+line_parsemetsv)                              
 
             else:
-                #print blocks
+
                 outblock = process_block(blocks)
                 file2.write("<s>\n")
                 file2.write("\n".join(outblock))
@@ -150,16 +160,23 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, help="test.blind or train")
     for root, subFolders, files in os.walk(rootdir):
-        for lang_folder in subFolders:
-            if pattern.match(lang_folder): #only language folders
+        for lang_folder in subFolders:            
+            if "BG" in lang_folder or "HE" in lang_folder or "LT" in lang_folder: #no conllu for those files; skip
+                continue
+            elif pattern.match(lang_folder): #only language folders
                 print "processing FOLDER: " + lang_folder
-                conllu = rootdir + "/" + lang_folder + "/train.conllu"
-                parsemetsv = rootdir + "/" + lang_folder + "/train.parsemetsv"
-                vert_out = os.path.splitext(conllu)[0]+ '_' + lang_folder + '.vert'
+                conllu_train = rootdir + "/" + lang_folder + "/train.conllu"
+                parsemetsv_train = rootdir + "/" + lang_folder + "/train.parsemetsv"
+                conllu_test = rootdir + "/" + lang_folder + "/test.conllu"
+                parsemetsv_test = rootdir + "/" + lang_folder + "/test.parsemetsv"
+                vert_out = os.path.splitext(conllu_train)[0]+ '_test_' + lang_folder + '.vert'
                 print vert_out
                 file2 = open(vert_out, 'w')
-                file2.write("<doc>\n")
-                read_blocks(conllu, parsemetsv, file2)
+                file2.write("<doc id=\"train2016\">\n")
+                read_blocks(conllu_train, parsemetsv_train, file2)
+                file2.write("</doc>\n")
+                file2.write("<doc id=\"test2016\">\n")
+                read_blocks(conllu_test, parsemetsv_test, file2)
                 file2.write("</doc>")
                 file2.close
 
