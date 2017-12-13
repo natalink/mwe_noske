@@ -61,58 +61,59 @@ se à penser le cas récent d'Échelon, sur lequel cette Assemblée se penchera 
 46      .       _       _
 
 ```
-
+After a long discussion (see issues) we came up with this (not already final) format
 Output: 
 ```
 <s>
-Nous    il      1       CL      CLS     n=p|p=1|s=suj|sentid=Europar.550_00191  2       suj     _       _       _       _
-voulons vouloir 2       V       V       m=ind|n=p|p=1|t=pst     0       root    _       _       _       _
-protéger        protéger        3       V       VINF    m=inf   2       obj     _       _       _       _
-notre   son     4       D       DET     n=s|s=poss      5       det     _       _       _       _
-droit   droit   5       N       NC      g=m|n=s|s=c     3       obj     _       _       _       _
-à       à       6       P       P       _       5       dep     _       _       _       _
-avoir   avoir   7       V       VINF    m=inf   6       obj.p   _       _       LVC:head;LVC:head;LVC:head      avoir_idée;avoir_sentiment;avoir_émotion
-des     un      8       D       DET     n=p|s=ind       9       det     _       _       _       _
-idées   idée    9       N       NC      g=f|n=p|s=c     7       obj     _       _       LVC:child       avoir_idée
-,       ,       10      PONCT   PONCT   s=w     7       ponct   _       _       _       _
-des     un      11      D       DET     n=p|s=ind       12      det     _       _       _       _
-sentiments      sentiment       12      N       NC      g=m|n=p|s=c     7       obj     _       _       LVC:child       avoir_sentiment
-,       ,       13      PONCT   PONCT   s=w     7       ponct   _       _       _       _
-des     un      14      D       DET     n=p|s=ind       15      det     _       _       _       _
-émotions        émotion 15      N       NC      g=f|n=p|s=c     7       obj     _       _       LVC:child       avoir_émotion
-,       ,       16      PONCT   PONCT   s=w     7       ponct   _       _       _       _
-contre  contre  17      P       P       _       7       mod     _       _       _       _
-l'      le      18      D       DET     n=s|s=def       19      det     _       _       _       _
-invasion        invasion        19      N       NC      g=f|n=s|s=c     17      obj.p   _       _       _       _
-technologique   technologique   20      A       ADJ     n=s|s=qual      19      mod     _       _       _       _
-des     _       21-22   _       _       _       _       _       _       _       _       _
-de      de      21      P       P       _       19      dep     _       _       _       _
-les     le      22      D       DET     g=m|n=p|s=def   24      det     _       _       _       _
-grands  grand   23      A       ADJ     g=m|n=p|s=qual  24      mod     _       _       _       _
-frères  frère   24      N       NC      g=m|n=p|s=c     21      obj.p   _       _       _       _
-,       ,       25      PONCT   PONCT   s=w     2       ponct   _       _       _       _
-comme   comme   26      C       CS      s=s     2       mod     _       _       _       _
-nous    le/lui  27      CL      CLO     n=p|p=1|s=obj   29      a_obj   _       _       _       _
-le      le      28      CL      CLO     g=m|n=s|p=3|s=obj       29      obj     _       _       _       _
-laisse  laisser 29      V       V       m=ind|n=s|p=3|t=pst     26      obj.cpl _       _       ID:head laisser_à_penser
-à       à       30      P       P       _       29      a_obj   _       _       ID:child        laisser_à_penser
-penser  penser  31      V       VINF    m=inf   30      obj.p   _       _       ID:child        laisser_à_penser
-le      le      32      D       DET     g=m|n=s|s=def   33      det     _       _       _       _
-cas     cas     33      N       NC      g=m|s=c 29      suj     _       _       _       _
-récent  récent  34      A       ADJ     g=m|n=s|s=qual  33      mod     _       _       _       _
-d'      de      35      P       P       _       33      dep     _       _       _       _
-Échelon Échelon 36      N       NPP     s=p     35      obj.p   _       _       _       _
-,       ,       37      PONCT   PONCT   s=w     33      ponct   _       _       _       _
-sur     sur     38      P       P       _       43      p_obj   _       _       _       _
-lequel  lequel  39      PRO     PROREL  g=m|n=s|s=rel   38      obj.p   _       _       _       _
-cette   ce      40      D       DET     g=f|n=s|s=dem   41      det     _       _       _       _
-Assemblée       assemblée       41      N       NC      g=f|n=s|s=c     43      suj     _       _       _       _
-se      le/lui  42      CL      CLR     p=3|s=refl      43      aff     _       _       IReflV:head     le/lui_pencher
-penchera        pencher 43      V       V       m=ind|n=s|p=3|t=fut     33      mod.rel _       _       IReflV:child    le/lui_pencher
-sous    sous    44      P       P       _       43      mod     _       _       _       _
-peu     peu     45      ADV     ADV     _       44      obj.p   _       _       _       _
-.       .       46      PONCT   PONCT   s=s     2       ponct   _       _       _       _
+Nous    il      1       CL      CLS     n=p|p=1|s=suj|sentid=Europar.550_00191  2       suj     _       _       _       _       _       _
+voulons vouloir 2       V       V       m=ind|n=p|p=1|t=pst     0       root    _       _       _       _       _       _
+protéger        protéger        3       V       VINF    m=inf   2       obj     _       _       _       _       _       _
+notre   son     4       D       DET     n=s|s=poss      5       det     _       _       _       _       _       _
+droit   droit   5       N       NC      g=m|n=s|s=c     3       obj     _       _       _       _       _       _
+à       à       6       P       P       _       5       dep     _       _       _       _       _       _
+avoir   avoir   7       V       VINF    m=inf   6       obj.p   _       _       LVC;LVC;LVC     head;head;head  1;3;4   avoir idée;avoir sentiment;avoir émotion
+des     un      8       D       DET     n=p|s=ind       9       det     _       _       _       _       _       _
+idées   idée    9       N       NC      g=f|n=p|s=c     7       obj     _       _       LVC     child   1       avoir idée
+,       ,       10      PONCT   PONCT   s=w     7       ponct   _       _       _       _       _       _
+des     un      11      D       DET     n=p|s=ind       12      det     _       _       _       _       _       _
+sentiments      sentiment       12      N       NC      g=m|n=p|s=c     7       obj     _       _       LVC     child   3       avoir sentiment
+,       ,       13      PONCT   PONCT   s=w     7       ponct   _       _       _       _       _       _
+des     un      14      D       DET     n=p|s=ind       15      det     _       _       _       _       _       _
+émotions        émotion 15      N       NC      g=f|n=p|s=c     7       obj     _       _       LVC     child   4       avoir émotion
+,       ,       16      PONCT   PONCT   s=w     7       ponct   _       _       _       _       _       _
+contre  contre  17      P       P       _       7       mod     _       _       _       _       _       _
+l'      le      18      D       DET     n=s|s=def       19      det     _       _       _       _       _       _
+invasion        invasion        19      N       NC      g=f|n=s|s=c     17      obj.p   _       _       _       _       _       _
+technologique   technologique   20      A       ADJ     n=s|s=qual      19      mod     _       _       _       _       _       _
+des     _       21-22   _       _       _       _       _       _       _       _       _       _       _
+de      de      21      P       P       _       19      dep     _       _       _       _       _       _
+les     le      22      D       DET     g=m|n=p|s=def   24      det     _       _       _       _       _       _
+grands  grand   23      A       ADJ     g=m|n=p|s=qual  24      mod     _       _       _       _       _       _
+frères  frère   24      N       NC      g=m|n=p|s=c     21      obj.p   _       _       _       _       _       _
+,       ,       25      PONCT   PONCT   s=w     2       ponct   _       _       _       _       _       _
+comme   comme   26      C       CS      s=s     2       mod     _       _       _       _       _       _
+nous    le/lui  27      CL      CLO     n=p|p=1|s=obj   29      a_obj   _       _       _       _       _       _
+le      le      28      CL      CLO     g=m|n=s|p=3|s=obj       29      obj     _       _       _       _       _       _
+laisse  laisser 29      V       V       m=ind|n=s|p=3|t=pst     26      obj.cpl _       _       ID      head    2       laisser à penser
+à       à       30      P       P       _       29      a_obj   _       _       ID      child   2       laisser à penser
+penser  penser  31      V       VINF    m=inf   30      obj.p   _       _       ID      child   2       laisser à penser
+le      le      32      D       DET     g=m|n=s|s=def   33      det     _       _       _       _       _       _
+cas     cas     33      N       NC      g=m|s=c 29      suj     _       _       _       _       _       _
+récent  récent  34      A       ADJ     g=m|n=s|s=qual  33      mod     _       _       _       _       _       _
+d'      de      35      P       P       _       33      dep     _       _       _       _       _       _
+Échelon Échelon 36      N       NPP     s=p     35      obj.p   _       _       _       _       _       _
+,       ,       37      PONCT   PONCT   s=w     33      ponct   _       _       _       _       _       _
+sur     sur     38      P       P       _       43      p_obj   _       _       _       _       _       _
+lequel  lequel  39      PRO     PROREL  g=m|n=s|s=rel   38      obj.p   _       _       _       _       _       _
+cette   ce      40      D       DET     g=f|n=s|s=dem   41      det     _       _       _       _       _       _
+Assemblée       assemblée       41      N       NC      g=f|n=s|s=c     43      suj     _       _       _       _       _       _
+se      le/lui  42      CL      CLR     p=3|s=refl      43      aff     _       _       IReflV  head    5       le/lui pencher
+penchera        pencher 43      V       V       m=ind|n=s|p=3|t=fut     33      mod.rel _       _       IReflV  child   5       le/lui pencher
+sous    sous    44      P       P       _       43      mod     _       _       _       _       _       _
+peu     peu     45      ADV     ADV     _       44      obj.p   _       _       _       _       _       _
+.       .       46      PONCT   PONCT   s=s     2       ponct   _       _       _       _       _       _
 </s>
+
 
 
 ```
