@@ -1,6 +1,6 @@
 NAME "Parseme VMWE 1.0"
-PATH "/opt/lindat/kontext-data/corpora/data/monolingual/parseme/1.0/parseme_cs-a"
-VERTICAL "/opt/lindat/kontext-data/corpora/vert/monolingual/parseme/1.0/parseme_cs-a"
+PATH "/opt/lindat/kontext-data/corpora/data/monolingual/parseme/1.0/parseme_fr-a"
+VERTICAL "/opt/lindat/kontext-data/corpora/vert/monolingual/parseme/1.0/parseme_fr-a"
 ENCODING utf-8
 INFO "The PARSEME shared task is a collection of corpora in 18 languages with annotation of verbal MWEs in running texts. Verbal MWEs include idioms (let the cat out of the bag), light verb constructions (make a decision), verb-particle constructions (give up), and inherently reflexive verbs (se suicider 'to suicide' in French). VMWEs were annotated according to universal guidelines. For most languages, parts of speech, lemmas, morphological features and/or syntactic dependencies are also provided."
 LANGUAGE "French"
