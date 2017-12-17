@@ -54,29 +54,29 @@ def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
 
         
         for ind, pos in enumerate(positions): # ugly hack!!!
-            if ind == 0 and out_vmwe_list[int(pos)] == '_': # :head, single
+            if ind == 0 and out_vmwe_list[int(pos)] == '_': # :first in MWE, single
                 out_vmwe_list[int(pos)] = type
-                out_vmwe_dependency_list[int(pos)] = "head"
+                out_vmwe_dependency_list[int(pos)] = "first"
                 out_lemma_list[int(pos)] = lemma
                 out_vmwe_number_list[int(pos)] = mwe_number
                 
             elif ind == 0 and out_vmwe_list[int(pos)] != '_':
                 
-                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":head"
-                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "head"
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":first"
+                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "first"
                 out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
                 out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
                 
             elif ind != 0 and out_vmwe_list[int(pos)] != '_':# ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_']
                 # this may have some bugs, test it on more use cases!!!   
-                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":head"
-                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "child"
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":first"
+                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "cont"
                 out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
                 out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
 
             else:
-                out_vmwe_list[int(pos)] = type# + ":child"
-                out_vmwe_dependency_list[int(pos)] = "child"
+                out_vmwe_list[int(pos)] = type# + ":cont"
+                out_vmwe_dependency_list[int(pos)] = "cont"
                 out_lemma_list[int(pos)] = lemma
                 out_vmwe_number_list[int(pos)] = mwe_number
                 
