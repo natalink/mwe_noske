@@ -1,11 +1,31 @@
 ## VMWE corpus to NoSkE
 
-This repository includes scripts and other files (registry) to convert corpora with verbal multiword expression annotation [PARSEME data](https://lindat.mff.cuni.cz/repository/xmlui/handle/11372/LRT-2282) into vertical format, so that to make them available via NoSke interface. 
+This repository includes scripts and other files (registry) to convert corpora with verbal multiword expression annotation [PARSEME data](https://lindat.mff.cuni.cz/repository/xmlui/handle/11372/LRT-2282) into vertical format, so that to make them available via NoSke and KonText interfaces. 
+The PARSEME data can be thus viewed on two different platforms:
+
+- KonText, moderated by Ansa: http://lindat.mff.cuni.cz/services/kontext/corpora/corplist , alternative [github page](https://github.com/ufal/lindat-corpora-conversions/tree/master/data/vertical/parseme) for KonText-related scripts
+- NoSke installation by Behrang: http://corpora.phil.hhu.de/parseme
+
+The manual pages for CQL queries:
+
+- [Manual](https://ufal.mff.cuni.cz/lindat-kontext/parseme-mwe) especially devoted to PARSEME data in KonText, to be filled with new examples
+- [CQL for Sketch Engine](https://www.sketchengine.co.uk/documentation/corpus-querying/)
+- KonText [query manual](https://wiki.korpus.cz/doku.php/en:kurz:uvod), [interface manual](https://wiki.korpus.cz/doku.php/en:manualy:kontext:index) (both by the Czech National Corpus team)
+- For those not familiar with KonText/NoSke interface, [some screenshots](https://ufal.mff.cuni.cz/lindat-kontext)
+
+
 
 
 #### Vertical representation 
 We decided to experiment first with VMWE represented as attributes. In the previous work by Behrang, MWEs were presented as structures (wrapped in xml tag), yet for the present data this may not be sufficient because of many discontinuous VMWEs. (this option is not excluded though).
-The last attributes will be : VMWEtype:head/childtype, e.g. LVC:head, or ID:child. Another attribute is VMWE lemma collected from all components of VMWE separated by underscore:
+The last attributes represent MWE:
+
+- mwe (MWE type, e.g. LVC, ID)
+- mwe_order. First we opted for head/child option, but since it does not reflect the dependency, just the order, we decided to mark it first/cont, see [#7](https://github.com/natalink/mwe_noske/issues/7) for discussion
+- mwe_id (id of MWE in a sentence)
+- mwe lemma - concatenation of lemmas, see also [#6](https://github.com/natalink/mwe_noske/issues/6) why this attribute
+
+
 
 Input - parsemetsv + respective conllu:
 
