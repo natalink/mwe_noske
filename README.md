@@ -11,7 +11,7 @@ The manual pages for CQL queries:
 - [Manual](https://ufal.mff.cuni.cz/lindat-kontext/parseme-mwe) especially devoted to PARSEME data in KonText, to be filled with new examples
 - [CQL for Sketch Engine](https://www.sketchengine.co.uk/documentation/corpus-querying/)
 - KonText [query manual](https://wiki.korpus.cz/doku.php/en:kurz:uvod), [interface manual](https://wiki.korpus.cz/doku.php/en:manualy:kontext:index) (both by the Czech National Corpus team)
-- For those not familiar with KonText/NoSke interface, [some screenshots](https://ufal.mff.cuni.cz/lindat-kontext)
+- For those not familiar with KonText/NoSke interface - quick intro, [some screenshots](https://ufal.mff.cuni.cz/lindat-kontext)
 
 
 
