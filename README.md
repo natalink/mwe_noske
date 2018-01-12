@@ -81,8 +81,8 @@ se à penser le cas récent d'Échelon, sur lequel cette Assemblée se penchera 
 46      .       _       _
 
 ```
-After a long discussion (see issues) we came up with this (not already final) format
-Output: 
+After a long discussion (see issues) we came up with this not already final format
+Output(outdated a bit: s/head/first, s/child/cont): 
 ```
 <s>
 Nous    il      1       CL      CLS     n=p|p=1|s=suj|sentid=Europar.550_00191  2       suj     _       _       _       _       _       _
