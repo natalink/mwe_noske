@@ -72,19 +72,21 @@ ATTRIBUTE misc {
 
 ATTRIBUTE mwe {
           TYPE "FD_FGD"
-	LOCALE "pt_BR.UTF-8"
           MULTIVALUE y
           MULTISEP ";"
 }
 ATTRIBUTE mwe_order {
           TYPE "FD_FGD"
-        LOCALE "pt_BR.UTF-8"
+          MULTIVALUE y
+          MULTISEP ";"
+}
+ATTRIBUTE mwe_order_new {
+          TYPE "FD_FGD"
           MULTIVALUE y
           MULTISEP ";"
 }
 ATTRIBUTE mwe_id {
           TYPE "FD_FGD"
-        LOCALE "pt_BR.UTF-8"
           MULTIVALUE y
           MULTISEP ";"
 }

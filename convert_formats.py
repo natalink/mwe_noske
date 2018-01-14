@@ -28,7 +28,7 @@ def process_block(block):
     dict_lemma = {}    
     dict_vmwe, dict_lemma = stack_vmwe_positions(mwe_list, lemma_list, dict_vmwe, dict_lemma)
     length_of_sentence = len(mwe_list)
-    out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
+    out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_dependency_list2, out_vmwe_number_list = form_columns(dict_vmwe, dict_lemma, length_of_sentence)
     newblock = []
 
     for line in block:
@@ -39,7 +39,7 @@ def process_block(block):
             newblock.append("\t".join(attrs))
     
     
-    outblock = [ "{}\t{}\t{}\t{}\t{}".format(a, b, c,d,f) for a, b, c, d, f in  zip(newblock, out_vmwe_list, out_vmwe_dependency_list, out_vmwe_number_list, out_lemma_list ) ]
+    outblock = [ "{}\t{}\t{}\t{}\t{}\t{}".format(a, b, c,d,e,f) for a, b, c, d, e, f in  zip(newblock, out_vmwe_list, out_vmwe_dependency_list, out_vmwe_dependency_list2, out_vmwe_number_list, out_lemma_list ) ]
     return outblock
     
 def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
@@ -47,6 +47,7 @@ def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
     out_vmwe_number_list = ['_'] * length_of_sentence #
     out_lemma_list = ['_'] * length_of_sentence
     out_vmwe_dependency_list = ['_'] * length_of_sentence
+    out_vmwe_dependency_list2 = ['_'] * length_of_sentence
     
     for mwe_number, vmwe_tags in dict_vmwe.iteritems():
         type = vmwe_tags.split("_")[0]
@@ -58,6 +59,7 @@ def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
             if ind == 0 and out_vmwe_list[int(pos)] == '_': # :first in MWE, single
                 out_vmwe_list[int(pos)] = type
                 out_vmwe_dependency_list[int(pos)] = "first"
+                out_vmwe_dependency_list2[int(pos)] = "first"
                 out_lemma_list[int(pos)] = lemma
                 out_vmwe_number_list[int(pos)] = mwe_number
                 
@@ -65,24 +67,43 @@ def form_columns (dict_vmwe, dict_lemma, length_of_sentence):
                 
                 out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":first"
                 out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "first"
+                out_vmwe_dependency_list2[int(pos)] = out_vmwe_dependency_list2[int(pos)] + ";" + "first"
                 out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
                 out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
+
+            elif ind == len(positions)-1 and out_vmwe_list[int(pos)] == '_': # :last in MWE, single
+                out_vmwe_list[int(pos)] = type
+                out_vmwe_dependency_list[int(pos)] = "cont"
+                out_vmwe_dependency_list2[int(pos)] = "last"
+                out_lemma_list[int(pos)] = lemma
+                out_vmwe_number_list[int(pos)] = mwe_number
+                
+            elif ind == len(positions)-1 and out_vmwe_list[int(pos)] != '_':
+                
+                out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":first"
+                out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "cont"
+                out_vmwe_dependency_list2[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "last"
+                out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
+                out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
+                
                 
             elif ind != 0 and out_vmwe_list[int(pos)] != '_':# ['_', '1:LVC', '_', '1;2:LVC', '_', '_', '_', '_', '2', '_']
                 # this may have some bugs, test it on more use cases!!!   
                 out_vmwe_list[int(pos)] =  out_vmwe_list[int(pos)] + ";" + type# + ":first"
                 out_vmwe_dependency_list[int(pos)] = out_vmwe_dependency_list[int(pos)] + ";" + "cont"
+                out_vmwe_dependency_list2[int(pos)] = out_vmwe_dependency_list2[int(pos)] + ";" + "cont"
                 out_lemma_list[int(pos)] =  out_lemma_list[int(pos)] + ";" + lemma
                 out_vmwe_number_list[int(pos)] = out_vmwe_number_list[int(pos)] + ";" + mwe_number
 
             else:
                 out_vmwe_list[int(pos)] = type# + ":cont"
                 out_vmwe_dependency_list[int(pos)] = "cont"
+                out_vmwe_dependency_list2[int(pos)] = "cont"
                 out_lemma_list[int(pos)] = lemma
                 out_vmwe_number_list[int(pos)] = mwe_number
                 
     #print out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list
-    return out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_number_list
+    return out_vmwe_list, out_lemma_list, out_vmwe_dependency_list, out_vmwe_dependency_list2, out_vmwe_number_list
             
            
 #########Given mwe and lemma attribute lists returns the positions. Output: mwe_list: {'1': 'LVC_3_5'} lemma_list:{'1': 'il_de'} ############
