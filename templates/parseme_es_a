@@ -5,7 +5,7 @@ ENCODING utf-8
 INFO "The PARSEME shared task is a collection of corpora in 18 languages with annotation of verbal MWEs in running texts. Verbal MWEs include idioms (let the cat out of the bag), light verb constructions (make a decision), verb-particle constructions (give up), and inherently reflexive verbs (se suicider 'to suicide' in French). VMWEs were annotated according to universal guidelines. For most languages, parts of speech, lemmas, morphological features and/or syntactic dependencies are also provided."
 LANGUAGE "Spanish"
 
-SHORTREF "=doc.id"
+SHORTREF "=doc.id,=s.id,=s.orig"
 TAGSETDOC "http://universaldependencies.github.io/docs/u/feat/index.html"
 DOCSTRUCTURE doc
 SUBCORPATTRS "doc.id"
@@ -103,6 +103,8 @@ STRUCTURE doc {
 }
 
 STRUCTURE s {
+    ATTRIBUTE id
+    ATTRIBUTE orig
 }
 
 MAXCONTEXT 50

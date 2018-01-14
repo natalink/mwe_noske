@@ -152,8 +152,19 @@ def read_blocks(input_conllu, parsemetsv, file2):
    
     with open(input_conllu) as file_conllu, open(parsemetsv) as file_parsemetsv: 
         blocks = []
+        sentid=''; sentorig=''; sentfile=''  # we'll treat all metadata as sentence metadata
         for line, line_parsemetsv in izip(file_conllu, file_parsemetsv):
-           
+
+            if line.startswith('# sent_id') or line.startswith('# sentid:'): # ES, FR, PT
+                words=line.split()
+                sentid=' id="'+words[-1]+'" '
+            elif line.startswith('# orig_file_sentence'): # ES
+                words=line.split()
+                sentorig=' orig="'+words[-1]+'"'
+            elif line.startswith('# FILE:'):    # BG, which we do not convert
+                words=line.split()
+                sentfile=' file="'+words[-1]+'"'
+
             if line.startswith('#'):
                 continue
         
@@ -173,7 +184,7 @@ def read_blocks(input_conllu, parsemetsv, file2):
             else:
 
                 outblock = process_block(blocks)
-                file2.write("<s>\n")
+                file2.write("<s"+sentid+sentorig+sentfile+">\n")
                 file2.write("\n".join(outblock))
                 file2.write("\n</s>\n")
                 empty_lines = 0
