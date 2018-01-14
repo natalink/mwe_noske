@@ -9,7 +9,8 @@ from __builtin__ import str
 
 
 pattern = re.compile("^..$")
-rootdir = "sharedtask_data"
+rootdir = "input"
+outdir = "output"
 
 def num_there(s):
     return any(i.isdigit() for i in s)
@@ -19,7 +20,7 @@ def process_block(block):
     lemma_list = []
     for index_line, line in enumerate(block):
         if num_there(line):
-            attributes = line.split()
+            attributes = line.split("\t")
             mwe_list.append(attributes[-1]) #last element is mwe tag from parsemetsv
             lemma_list.append(attributes[1]) #third attribute from conllu is lemma 
     
@@ -32,7 +33,7 @@ def process_block(block):
 
     for line in block:
         if num_there(line):
-            attrs = line.split()
+            attrs = line.split("\t")
             del attrs[-4:]
             # done earlier attrs[1], attrs[0] = attrs[0], attrs[1] #swap ID and wordform (While compiling, manatee script will treat first column as word forms)
             newblock.append("\t".join(attrs))
@@ -141,6 +142,9 @@ def read_blocks(input_conllu, parsemetsv, file2):
                 attrs = line.split("\t")
                 attrs[0],attrs[1] = attrs[1], attrs[0]
                 attrs[1],attrs[2] = attrs[2], attrs[1]
+                if attrs[1] == "" and attrs[0][0]=="-":
+                    attrs[1]=attrs[0][1:]  # correct wrong lemmatization of negative numbers!
+                del attrs[8]
                 swapped_line = "\t".join(attrs)
                 line_parsemetsv = line_parsemetsv.strip()
                 blocks.append(swapped_line+"\t"+line_parsemetsv)                              
@@ -169,13 +173,13 @@ def main():
                 parsemetsv_train = rootdir + "/" + lang_folder + "/train.parsemetsv"
                 conllu_test = rootdir + "/" + lang_folder + "/test.conllu"
                 parsemetsv_test = rootdir + "/" + lang_folder + "/test.parsemetsv"
-                vert_out = os.path.splitext(conllu_train)[0]+ '_test_' + lang_folder + '.vert'
+                vert_out = outdir + "/parseme_" + lang_folder.lower() + "-a"
                 print vert_out
                 file2 = open(vert_out, 'w')
-                file2.write("<doc id=\"train2016\">\n")
+                file2.write("<doc id=\"train\">\n")
                 read_blocks(conllu_train, parsemetsv_train, file2)
                 file2.write("</doc>\n")
-                file2.write("<doc id=\"test2016\">\n")
+                file2.write("<doc id=\"test\">\n")
                 read_blocks(conllu_test, parsemetsv_test, file2)
                 file2.write("</doc>")
                 file2.close
