@@ -1,9 +1,9 @@
-NAME "Parseme VMWE 1.0"
-PATH "/opt/lindat/kontext-data/corpora/data/monolingual/parseme/1.0/parseme_fr-a"
-VERTICAL "/opt/lindat/kontext-data/corpora/vert/monolingual/parseme/1.0/parseme_fr-a"
+NAME "Parseme VMWE 1.0 - Polish"
+PATH "/opt/lindat/kontext-data/corpora/data/monolingual/parseme/1.0/parseme_pl-a"
+VERTICAL "/opt/lindat/kontext-data/corpora/vert/monolingual/parseme/1.0/parseme_pl-a"
 ENCODING utf-8
 INFO "The PARSEME shared task is a collection of corpora in 18 languages with annotation of verbal MWEs in running texts. Verbal MWEs include idioms (let the cat out of the bag), light verb constructions (make a decision), verb-particle constructions (give up), and inherently reflexive verbs (se suicider 'to suicide' in French). VMWEs were annotated according to universal guidelines. For most languages, parts of speech, lemmas, morphological features and/or syntactic dependencies are also provided."
-LANGUAGE "French"
+LANGUAGE "Polish"
 
 SHORTREF "=doc.id"
 TAGSETDOC "http://universaldependencies.github.io/docs/u/feat/index.html"
@@ -12,14 +12,14 @@ SUBCORPATTRS "doc.id"
 
 ATTRIBUTE word {
         TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
+        LOCALE "pl_PL.UTF-8"
 }
 
 ATTRIBUTE lc {
         DYNAMIC utf8lowercase
         DYNLIB internal
         FUNTYPE s
-        ARG1 "cs_CZ.UTF-8"
+        ARG1 "pl_PL.UTF-8"
         FROMATTR word
         TYPE index
         TRANSQUERY yes
@@ -27,7 +27,7 @@ ATTRIBUTE lc {
 
 ATTRIBUTE lemma {
         TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
+        LOCALE "pl_PL.UTF-8"
 }
 
 ATTRIBUTE lemma_lc {
@@ -40,69 +40,67 @@ ATTRIBUTE lemma_lc {
         TRANSQUERY yes
 }
 
-ATTRIBUTE ord {
-        TYPE "FD_FGD"
-}
-ATTRIBUTE upostag {
+ATTRIBUTE id {
         TYPE "FD_FGD"
 }
 
+ATTRIBUTE upostag {
+        TYPE "FD_FGD"
+}
 ATTRIBUTE xpostag {
         TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
         MULTIVALUE y
         MULTISEP "|"
 }
 ATTRIBUTE feats {
         TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
         MULTIVALUE y
         MULTISEP "|"
 }
+
 ATTRIBUTE head {
-        TYPE "FD_FGD"
+          TYPE "FD_FGD"
 }
+
 ATTRIBUTE deprel {
         TYPE "FD_FGD"
 }
-ATTRIBUTE deps {
-        TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
+
+ATTRIBUTE misc {
+          TYPE "FD_FGD"
 }
-ATTRIBUTE nospaceafter {
-        TYPE "FD_FGD"
+
+ATTRIBUTE mwe {
+          TYPE "FD_FGD"
+	LOCALE "pl_PL.UTF-8"
+          MULTIVALUE y
+          MULTISEP ";"
 }
-ATTRIBUTE vmwe_type {
-        TYPE "FD_FGD"
-	LOCALE "fr_FR.UTF-8"
-        MULTIVALUE y
-        MULTISEP ";"
-	
+ATTRIBUTE mwe_order {
+          TYPE "FD_FGD"
+        LOCALE "pl_PL.UTF-8"
+          MULTIVALUE y
+          MULTISEP ";"
 }
-ATTRIBUTE vmwe_first {
-        TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
-        MULTIVALUE y
-        MULTISEP ";"
+ATTRIBUTE mwe_id {
+          TYPE "FD_FGD"
+        LOCALE "pl_PL.UTF-8"
+          MULTIVALUE y
+          MULTISEP ";"
 }
-ATTRIBUTE vmwe_id {
-        TYPE "FD_FGD"
-        LOCALE "fr_FR.UTF-8"
-        MULTIVALUE y
-        MULTISEP ";"
+ATTRIBUTE mwe_lemma {
+          TYPE "FD_FGD"
+	LOCALE "pl_PL.UTF-8"
+          MULTIVALUE y
+          MULTISEP ";"
 }
-ATTRIBUTE vmwe_lemma {
-        TYPE "FD_FGD"
-	LOCALE "fr_FR.UTF-8"
-        MULTIVALUE y
-	MULTISEP ";"
-}
-STRUCTURE s {
-	ATTRIBUTE id
-}
+
 STRUCTURE doc {
-	ATTRIBUTE id
-        ATTRIBUTE wordcount
+    ATTRIBUTE id
+    ATTRIBUTE "wordcount"
+}
+
+STRUCTURE s {
 }
 
 MAXCONTEXT 50
